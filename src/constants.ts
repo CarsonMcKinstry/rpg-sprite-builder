@@ -1,12 +1,15 @@
-export const cellSize = 20;
-export const numCols = 18;
-export const numRows = 26;
+import { SpriteBoard } from "./types";
+export const cellSize = 10;
 
-export type SpriteBoard = Array<Array<number>>;
+export const numCols = 52;
+export const numRows = 52;
 
-export const canvasSize = 521;
-export const canvasWidth = 361;
+export const canvasWidth = 521;
 export const canvasHeight = 521;
+
+export const defaultSpriteBoard: SpriteBoard = [...Array(numRows)].fill(
+  [...Array(numCols)].fill(0)
+);
 
 export const colorMap = [
   "white",

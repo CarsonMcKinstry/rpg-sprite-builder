@@ -1,42 +1,32 @@
-import React, { FunctionComponent, MouseEventHandler } from "react";
+import React, { FunctionComponent, createContext } from "react";
+import "./ColorPicker.scss";
 
-import { colorMap } from "./common";
+import { colorMap } from "./constants";
 
-const ColorPicker: FunctionComponent<{
+interface ColorPickerProps {
   currentColor: number;
-  chooseColor: (i: number) => MouseEventHandler;
-}> = ({ chooseColor, currentColor }) => {
+  chooseColor: (i: number) => void;
+}
+
+const ColorPicker: FunctionComponent<ColorPickerProps> = ({
+  currentColor,
+  chooseColor
+}) => {
   const palette = colorMap.map((color, i) => {
     return (
       <div
         key={color + "_" + i}
+        className="swatch"
         style={{
           backgroundColor: color,
-          boxSizing: "border-box",
-          borderWidth: currentColor === i ? 4 : 0,
-          borderColor: "gray",
-          borderStyle: "solid",
-          height: 40,
-          width: 40,
-          transition: "border 0.05s ease-in-out"
+          borderWidth: currentColor === i ? 4 : 0
         }}
-        onClick={chooseColor(i)}
+        onClick={() => chooseColor(i)}
       />
     );
   });
 
-  return (
-    <div
-      style={{
-        border: "1px solid black",
-        width: 160,
-        display: "flex",
-        flexWrap: "wrap"
-      }}
-    >
-      {palette}
-    </div>
-  );
+  return <div className="palette">{palette}</div>;
 };
 
 export default ColorPicker;

@@ -1,0 +1,15 @@
+.palette {
+  border: 1px solid black;
+  width: 160px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  box-sizing: border-box;
+  border-color: gray;
+  border-style: solid;
+  height: 40px;
+  width: 40px;
+  transition: border 0.05s ease;
+}
