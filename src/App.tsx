@@ -1,6 +1,5 @@
 // import React, { useReducer, useState, MouseEvent } from "react";
 // import logo from "./logo.svg";
-// import "./App.css";
 
 // import Sprite from "./Sprite";
 // import ColorPicker from "./ColorPicker";
@@ -114,6 +113,7 @@
 
 import React from "react";
 import SpriteBuilder from "./SpriteBuilder";
+import "./App.scss";
 
 import ColorBuilderProvider from "./ColorPickerContext";
 

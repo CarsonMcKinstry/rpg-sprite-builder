@@ -3,12 +3,16 @@
   width: 160px;
   display: flex;
   flex-wrap: wrap;
+
+  @media screen and (max-width: 800px) {
+    width: 320px;
+  }
 }
 
 .swatch {
   box-sizing: border-box;
-  border-color: gray;
-  border-style: solid;
+  border-color: white;
+  border-style: dashed;
   height: 40px;
   width: 40px;
   transition: border 0.05s ease;

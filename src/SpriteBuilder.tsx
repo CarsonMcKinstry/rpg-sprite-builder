@@ -3,6 +3,7 @@ import { Position } from "./types";
 import { defaultSpriteBoard } from "./constants";
 import ToolBox from "./ToolBox";
 import Sprite from "./Sprite";
+import "./SpriteBuilder.scss";
 
 const SpriteBuilder = () => {
   const [spriteBoard, setSpriteBoard] = useState(defaultSpriteBoard);
@@ -23,7 +24,7 @@ const SpriteBuilder = () => {
   }
 
   return (
-    <div>
+    <div className="container">
       <Sprite board={spriteBoard} updateSprite={updateBoard} />
       <ToolBox />
     </div>
