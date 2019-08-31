@@ -10,6 +10,10 @@ const db = openDB("rpg-sprite-builder", 1, {
       autoIncrement: true,
       keyPath: "id"
     });
+    upgradeDB.createObjectStore("usedColors", {
+      autoIncrement: true,
+      keyPath: "id"
+    });
   }
 });
 
@@ -17,6 +21,8 @@ const typeDefs = gql`
   scalar DateTime
 
   scalar Board
+
+  scalar Color
 
   type SpriteBoard {
     id: ID!
@@ -26,15 +32,23 @@ const typeDefs = gql`
     updatedAt: DateTime!
   }
 
+  type UsedColor {
+    id: ID!
+    color: Color!
+  }
+
   type Query {
     boards: [SpriteBoard]
     board(id: ID!): SpriteBoard
+    usedColors: [UsedColor]
   }
 
   type Mutation {
-    create(name: String, board: Board!): SpriteBoard!
-    update(id: ID!, name: String, board: Board!): SpriteBoard!
-    delete(id: ID!): Int!
+    createBoard(name: String, board: Board!): SpriteBoard!
+    updateBoard(id: ID!, name: String, board: Board!): SpriteBoard!
+    deleteBoard(id: ID!): Int!
+
+    addUsedColor(color: Color!): UsedColor!
   }
 `;
 
@@ -44,14 +58,38 @@ interface ResolverContext {
 
 // type ResolverType<A = any> = (root: any, args: A, ctx: ResolverContext) => any;
 
+const hexToRGB = (hex: string) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  result!.shift();
+  return result!.map(i => parseInt(i, 16));
+};
+
+const addZero = (n: string) => (Number(n) < 10 ? `0${n}` : n);
+
+const RGBtoHex = ([r, g, b]: [number, number, number]) => {
+  return `#${addZero(r.toString(16))}${addZero(g.toString(16))}${addZero(
+    b.toString(16)
+  )}`;
+};
+
 const resolvers = {
+  Color: new GraphQLScalarType({
+    name: "Color",
+    parseValue(value) {
+      return hexToRGB(value);
+    },
+    serialize(value) {
+      return RGBtoHex(value);
+    }
+  }),
   Board: new GraphQLScalarType({
     name: "Board",
     parseValue(value) {
-      return value.map((row: any) => row.join(",")).join("\n");
+      return value.map((row: any) => row.map(hexToRGB));
     },
     serialize(value) {
-      return [...value.split("\n").map((row: any) => row.split(","))];
+      return value.map((row: any) => row.map(RGBtoHex));
+      // return [...value.split("\n").map((row: any) => row.split(",").map())];
     }
   }),
   Query: {
@@ -68,10 +106,27 @@ const resolvers = {
         .transaction("spriteBoards", "readonly")
         .objectStore("spriteBoards")
         .getAll();
+    },
+    usedColors: async (root: any, args: {}, ctx: ResolverContext) => {
+      const db = await ctx.db;
+      const os = db
+        .transaction("usedColors", "readonly")
+        .objectStore("usedColors");
+
+      const keys = await os.getAllKeys();
+
+      if (keys.length < 1) return [];
+
+      const r = await os.getAll();
+
+      return r
+        .reverse()
+        .slice(0, 16)
+        .reverse();
     }
   },
   Mutation: {
-    create: async (
+    createBoard: async (
       root: any,
       args: { name: string; board: SpriteBoard },
       ctx: ResolverContext
@@ -88,7 +143,7 @@ const resolvers = {
 
       return os.get(id);
     },
-    update: async (
+    updateBoard: async (
       root: any,
       args: {
         id: number;
@@ -118,12 +173,29 @@ const resolvers = {
 
       return os.get(id);
     },
-    delete: async (root: any, args: { id: number }, ctx: ResolverContext) => {
+    deleteBoard: async (
+      root: any,
+      args: { id: number },
+      ctx: ResolverContext
+    ) => {
       const db = await ctx.db;
       return db
         .transaction("spriteBoards", "readwrite")
         .objectStore("spriteBoards")
         .delete(args.id);
+    },
+    addUsedColor: async (
+      root: any,
+      args: { color: [number, number, number] },
+      ctx: ResolverContext
+    ) => {
+      const db = await ctx.db;
+      const os = db
+        .transaction("usedColors", "readwrite")
+        .objectStore("usedColors");
+      const id = await os.add({ color: args.color });
+
+      return os.get(id);
     }
   }
 };
@@ -133,5 +205,14 @@ const executableSchema = makeExecutableSchema({
   resolvers
 });
 
-export const query = (q: string, v?: { [key: string]: any }) =>
-  graphql(executableSchema, q, null, { db }, v);
+export const query = async (q: string, v?: { [key: string]: any }) => {
+  const res = await graphql(executableSchema, q, null, { db }, v);
+
+  if (res.errors && res.errors.length > 0) {
+    throw res.errors;
+  }
+
+  if (res.data) {
+    return res.data;
+  }
+};

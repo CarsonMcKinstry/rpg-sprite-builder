@@ -53,18 +53,19 @@ export function useQuery<V>(
   useEffect(() => {
     dispatch({ type: "START" });
     performQuery(query, options.variables)
-      .then(r => {
-        const { errors } = r;
-        if (errors) {
-          throw errors;
-        }
-        return r;
-      })
-      .then(({ data }) => {
+      .then(data => {
         dispatch({ type: "DATA", payload: data });
       })
       .catch(errors => dispatch({ type: "ERROR", payload: errors }));
-  }, [query, options]); // eslint-disable-line
+  }, [query, options]);
 
-  return queryState;
+  return {
+    ...queryState,
+    runQuery: () =>
+      performQuery(query, options.variables)
+        .then(data => {
+          dispatch({ type: "DATA", payload: data });
+        })
+        .catch(errors => dispatch({ type: "ERROR", payload: errors }))
+  };
 }

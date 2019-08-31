@@ -12,12 +12,12 @@ export interface ColorPickerValue {
 }
 
 export const ColorPickerContext = createContext<ColorPickerValue>({
-  currentColor: "white",
+  currentColor: "#ffffff",
   setCurrentColor: i => undefined
 });
 
 const ColorPickerProvider: FunctionComponent<{}> = ({ children }) => {
-  const [currentColor, setCurrentColor] = useState("white");
+  const [currentColor, setCurrentColor] = useState("#ffffff");
   return (
     <ColorPickerContext.Provider
       value={{

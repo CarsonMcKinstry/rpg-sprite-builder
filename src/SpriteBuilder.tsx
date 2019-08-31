@@ -6,10 +6,11 @@ import Sprite from "./Sprite";
 import "./SpriteBuilder.scss";
 import gql from "graphql-tag";
 import { query } from "./db";
+import faker from "faker";
 
-const saveQuery = gql`
+const saveQuery = `
   mutation saveSpriteBoard($name: String, $board: Board!) {
-    create(name: $name, board: $board) {
+    createBoard(name: $name, board: $board) {
       id
       name
       board
@@ -39,14 +40,21 @@ const SpriteBuilder = () => {
     setSpriteBoard(nextSpriteBoard);
   }
 
+  function saveBoard() {
+    query(saveQuery, {
+      board: spriteBoard,
+      name: faker.fake("{{random.word}}-{{random.word}}-{{random.word}}")
+    });
+  }
+
   return (
     <div className="container">
       <Sprite board={spriteBoard} updateSprite={updateBoard} />
       <ToolBox
         save={() => {
-          console.log("save clicked");
+          saveBoard();
         }}
-        load={() => {
+        print={() => {
           console.log("load clicked");
         }}
         reset={() => {
