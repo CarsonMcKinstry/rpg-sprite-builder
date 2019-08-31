@@ -51,9 +51,7 @@ const resolvers = {
       return value.map((row: any) => row.join(",")).join("\n");
     },
     serialize(value) {
-      return [
-        ...value.split("\n").map((row: any) => row.split(",").map(Number))
-      ];
+      return [...value.split("\n").map((row: any) => row.split(","))];
     }
   }),
   Query: {

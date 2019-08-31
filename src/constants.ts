@@ -8,7 +8,7 @@ export const canvasWidth = 521;
 export const canvasHeight = 521;
 
 export const defaultSpriteBoard: SpriteBoard = [...Array(numRows)].fill(
-  [...Array(numCols)].fill(0)
+  [...Array(numCols)].fill("white")
 );
 
 const grayScale = ["white", "LightGray", "Grey", "black"];

@@ -4,8 +4,8 @@ import "./ColorPicker.scss";
 import { colorMap } from "./constants";
 
 interface ColorPickerProps {
-  currentColor: number;
-  chooseColor: (i: number) => void;
+  currentColor: string;
+  chooseColor: (i: string) => void;
 }
 
 const ColorPicker: FunctionComponent<ColorPickerProps> = ({
@@ -19,9 +19,9 @@ const ColorPicker: FunctionComponent<ColorPickerProps> = ({
         className="swatch"
         style={{
           backgroundColor: color,
-          borderWidth: currentColor === i ? 4 : 0
+          borderWidth: currentColor === color ? 4 : 0
         }}
-        onClick={() => chooseColor(i)}
+        onClick={() => chooseColor(color)}
       />
     );
   });

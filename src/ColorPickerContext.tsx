@@ -7,17 +7,17 @@ import React, {
 } from "react";
 
 export interface ColorPickerValue {
-  currentColor: number;
-  setCurrentColor: Dispatch<SetStateAction<number>>;
+  currentColor: string;
+  setCurrentColor: Dispatch<SetStateAction<string>>;
 }
 
 export const ColorPickerContext = createContext<ColorPickerValue>({
-  currentColor: 1,
+  currentColor: "white",
   setCurrentColor: i => undefined
 });
 
 const ColorPickerProvider: FunctionComponent<{}> = ({ children }) => {
-  const [currentColor, setCurrentColor] = useState(1);
+  const [currentColor, setCurrentColor] = useState("white");
   return (
     <ColorPickerContext.Provider
       value={{
