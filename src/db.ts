@@ -95,10 +95,13 @@ const resolvers = {
   Query: {
     board: async (root: any, args: { id: number }, ctx: ResolverContext) => {
       const db = await ctx.db;
-      return db
+
+      const r = await db
         .transaction("spriteBoards", "readonly")
         .objectStore("spriteBoards")
-        .get(args.id);
+        .get(Number(args.id));
+
+      return r;
     },
     boards: async (root: any, args: {}, ctx: ResolverContext) => {
       const db = await ctx.db;
@@ -119,10 +122,7 @@ const resolvers = {
 
       const r = await os.getAll();
 
-      return r
-        .reverse()
-        .slice(0, 16)
-        .reverse();
+      return r.reverse().slice(0, 16);
     }
   },
   Mutation: {
@@ -153,21 +153,17 @@ const resolvers = {
       ctx: ResolverContext
     ) => {
       const db = await ctx.db;
-      const updates = {
-        id: args.id,
-        board: args.board,
-        updatedAt: new Date().toISOString(),
-        name: ""
-      };
-
-      if (args.name) {
-        updates.name = args.name;
-      } else {
-        delete updates.name;
-      }
       const os = db
         .transaction("spriteBoards", "readwrite")
         .objectStore("spriteBoards");
+
+      const current = await os.get(Number(args.id));
+
+      const updates = {
+        ...current,
+        board: args.board,
+        updatedAt: new Date().toISOString()
+      };
 
       const id = await os.put(updates);
 
@@ -182,7 +178,7 @@ const resolvers = {
       return db
         .transaction("spriteBoards", "readwrite")
         .objectStore("spriteBoards")
-        .delete(args.id);
+        .delete(Number(args.id));
     },
     addUsedColor: async (
       root: any,

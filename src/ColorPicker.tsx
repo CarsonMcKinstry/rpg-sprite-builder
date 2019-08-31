@@ -68,9 +68,11 @@ const ColorPicker: FunctionComponent<ColorPickerProps> = ({
 
   const colorExistsInPalette = () => {
     if (!loading) {
-      return !!data.usedColors.find(
+      const c = !!data.usedColors.find(
         ({ color }: { color: string }) => color === currentColor
       );
+
+      console.log(c);
     }
 
     return false;
